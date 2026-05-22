@@ -126,3 +126,43 @@ Ne plus jamais utiliser AIRTABLE_TOKEN, BASE_ID ou TABLE_NAME.
   → recalculer via GET /api/migrate/anciennete après import
 - rentabilite : calculé côté JS frontend (honoraires_cpta / temps_passe)
 - anciennete badge "Nouveau" : anciennete < 1 ou date_entree récente
+
+Dans CLAUDE.md, ajoute cette section après ## Pièges connus :
+
+## Table NAF
+- Table naf (code TEXT, libelle TEXT) dans PostgreSQL
+- Importée via GET /api/migrate/naf (données hardcodées dans main.py)
+- Trigger update_activite_r : remplit activite_r automatiquement
+  quand code_naf_r change (prend les chiffres avant le point)
+- Après import CSV massif : appeler /api/migrate/activite
+
+## Colonnes de type TEXT à ne pas confondre avec NUMERIC
+Ces colonnes stockent du texte (ex: "détecté", "en cours") mais
+étaient créées en NUMERIC dans le schéma initial :
+suivi_mission_retraite, suivi_mission_patrimoniale,
+suivi_mission_placement, suivi_mission_prevoyance
+Si erreur "invalid input syntax for type numeric" :
+ALTER TABLE clients ALTER COLUMN suivi_mission_retraite TYPE TEXT;
+(idem pour les 3 autres)
+
+## Formats d'affichage
+- Dates affichées en JJ/MM (sans année) dans toutes les pages
+- SIRET : exactement 9 chiffres (validation frontend)
+- filterField dans decl-engine.js : toujours en snake_case minuscules
+  ex: "ca12", "tvs", "is", "impot_sur_le_revenu"
+
+## Endpoints de migration
+Appeler une seule fois après déploiement ou import massif :
+- GET /api/migrate/naf → importe les 88 codes NAF
+- GET /api/migrate/activite → remplit activite_r depuis code_naf_r
+- GET /api/migrate/anciennete → recalcule anciennete depuis date_entree
+- GET /api/migrate/trigger-activite → recrée le trigger PostgreSQL
+
+### ÉTAPE 8 — Champ rendement calculé ✅ TERMINÉ
+- Colonne rendement (numeric) ajoutée dans table clients
+- Fonction calc_rendement(siret) : score 0-100 pondéré
+  (taux horaire 50% + ancienneté 20% + ca_r 15% + resultat_r 15%)
+- Trigger trg_rendement BEFORE INSERT/UPDATE auto-recalcule
+- Endpoints : /api/migrate/rendement_setup, install_trigger_rendement
+- Endpoint debug : /api/debug/rendement, /api/debug/triggers
+- Page rendement.html : tri DESC + filtre par tranche + badges couleur
