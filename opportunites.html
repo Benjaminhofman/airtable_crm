@@ -186,7 +186,7 @@ function buildCheckbox(c, field) {
     <td>
         <input type="checkbox"
             ${c[field] ? "checked" : ""}
-            onchange="updateField('${c.id}', '${field}', this.checked)">
+            onchange="updateField('${c["siret"]}', '${field}', this.checked)">
     </td>`;
 }
 

@@ -179,7 +179,7 @@ function buildSelect(c, field) {
 
     return `
     <td onclick="event.stopPropagation()">
-        <select onchange="updateField('${c.id}', '${field}', this.value)">
+        <select onchange="updateField('${c["siret"]}', '${field}', this.value)">
 
             <option value="" ${value === "" ? "selected" : ""}></option>
 
@@ -194,14 +194,14 @@ function buildSelect(c, field) {
 }
 
 // update airtable
-async function updateField(id, field, value) {
+async function updateField(siret, field, value) {
     await fetch(API_URL + "/update-airtable", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, field, value })
+        body: JSON.stringify({ siret, field, value })
     });
 
-    const client = dataGlobal.find(c => c.id === id);
+    const client = dataGlobal.find(c => c["siret"] === siret);
     if (client) client[field] = value;
 }
 

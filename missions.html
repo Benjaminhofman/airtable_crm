@@ -151,7 +151,7 @@ function buildTextarea(c, field) {
     <td>
         <textarea
             onclick="event.stopPropagation()"
-            onchange="updateField('${c.id}', '${field}', this.value)"
+            onchange="updateField('${c["siret"]}', '${field}', this.value)"
         >${c[field] || ""}</textarea>
     </td>`;
 }
