@@ -1099,8 +1099,8 @@ const TEXT_FIELDS = [
     { id: "tel",             field: "tel" },
     { id: "collaborateur",   field: "collaborateur" },
     { id: "assistant",       field: "assistant" },
-    { id: "honoraires_cpta", field: "honoraires cpta" },
-    { id: "temps_passe",     field: "temps passé" },
+    { id: "honoraires_cpta", field: "honoraires cpta", numeric: true },
+    { id: "temps_passe",     field: "temps passé",    numeric: true },
     { id: "code_impot_gouv", field: "code impot gouv" },
     { id: "code_urssaf",     field: "code URSSAF" },
 ];
@@ -1181,7 +1181,11 @@ function collectForm(prefix) {
         const el = document.getElementById(`${prefix}-${f.id}`);
         if (!el) return;
         const v = el.value.trim();
-        if (v !== '') data[f.field] = v;
+        if (f.numeric) {
+            data[f.field] = v === '' ? null : (isNaN(parseFloat(v)) ? null : parseFloat(v));
+        } else {
+            if (v !== '') data[f.field] = v;
+        }
     });
     TOGGLE_FIELDS.forEach(f => {
         const el = document.getElementById(`${prefix}-${f.id}`);
