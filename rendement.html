@@ -211,11 +211,11 @@ function display(data) {
 
         /* SAVE */
         tempsInput.addEventListener("change", (e) => {
-            updateField(c.id, "temps passé", e.target.value, e.target);
+            updateField(c["siret"], "temps passé", e.target.value, e.target);
         });
 
         honosInput.addEventListener("change", (e) => {
-            updateField(c.id, "honoraires cpta", e.target.value, e.target);
+            updateField(c["siret"], "honoraires cpta", e.target.value, e.target);
         });
 
         calculerLigne(tr);

@@ -277,7 +277,7 @@ function display(data) {
                 cb.className = 'decl-checkbox';
                 // stopPropagation évite toute interférence avec d'autres écouteurs
                 cb.onclick = e => e.stopPropagation();
-                cb.onchange = function () { updateCheckbox(c.id, col.field, this.checked, this); };
+                cb.onchange = function () { updateCheckbox(c["siret"], col.field, this.checked, this); };
             } else {
                 cb.className = 'readonly-checkbox';
                 cb.title = 'Lecture seule — modifier via la page Dividendes';
