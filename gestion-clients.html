@@ -1338,23 +1338,18 @@ async function updateClient() {
     btn.innerHTML = '<span class="spinner"></span>Enregistrement…';
     showFeedback('feedback-modifier', 'loading', 'Enregistrement en cours…');
 
-    const body = { siret: selectedSiret, ...collectForm('m') };
+    const body = collectForm('m');
 
     try {
-        // Résolution du record_id Airtable depuis le siret
-        const recRes = await fetch(API_URL + "/client/" + selectedSiret);
-        if (!recRes.ok) throw new Error("Client introuvable");
-        const recData = await recRes.json();
-        const recordId = recData.id;
-
-        const res = await fetch(API_URL + "/client/" + recordId, {
+        const res = await fetch(API_URL + "/client/" + encodeURIComponent(selectedSiret), {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
         });
         const json = await res.json();
         if (!res.ok) {
-            showFeedback('feedback-modifier', 'error', `❌ ${json.error || 'Erreur serveur'}`);
+            const errMsg = typeof json.error === 'object' ? JSON.stringify(json.error) : (json.error || json.detail || 'Erreur serveur');
+            showFeedback('feedback-modifier', 'error', `❌ ${errMsg}`);
         } else {
             showFeedback('feedback-modifier', 'success', `✅ Client mis à jour.`);
             allClients = []; // invalide le cache

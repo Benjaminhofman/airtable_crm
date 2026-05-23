@@ -59,9 +59,13 @@ def add_client():
     return jsonify(result)
 
 
-@app.route("/client/<record_id>", methods=["PATCH"])
-def update_client(record_id):
+@app.route("/client/<siret>", methods=["PATCH"])
+def update_client(siret):
     data = request.json
+    records = get_records(formula=f"{{siret}}='{siret}'")
+    if not records or isinstance(records, dict):
+        return jsonify({"error": f"Client introuvable pour siret={siret}"}), 404
+    record_id = records[0]["id"]
     result = update_record(record_id, data)
 
     if "error" in result:
