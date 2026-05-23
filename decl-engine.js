@@ -41,7 +41,7 @@ function display(data) {
         // Colonnes fixes — le nom est un lien vers la fiche client
         tr.innerHTML = `
             <td>${esc(c["code client"])}</td>
-            <td class="name"><a href="client.html?id=${c.id}" class="client-link">${esc(c["nom client"])}</a></td>
+            <td class="name"><a href="client.html?siret=${c["siret"]}" class="client-link">${esc(c["nom client"])}</a></td>
             <td>${esc(c["assistant"])}</td>
             <td>${esc(c["collaborateur"])}</td>
             <td>${esc(c["année"])}</td>

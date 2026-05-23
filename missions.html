@@ -124,7 +124,7 @@ function display(data) {
     data.forEach(c => {
 
         table.innerHTML += `
-        <tr onclick="window.location.href='client.html?id=${c.id}'"
+        <tr onclick="window.location.href='client.html?siret=${c["siret"]}'"
             style="cursor:pointer">
 
             <td>${c["code client"] || ""}</td>

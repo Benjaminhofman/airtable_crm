@@ -158,7 +158,7 @@ function display(data) {
         <tr 
             onmouseenter="showTooltip(event, ${JSON.stringify(c).replace(/"/g, '&quot;')})"
             onmouseleave="hideTooltip()"
-            onclick="window.location.href='client.html?id=${c.id}'"
+            onclick="window.location.href='client.html?siret=${c["siret"]}'"
         >
 
             <td>${c["code client"] || ""}</td>
