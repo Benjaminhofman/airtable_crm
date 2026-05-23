@@ -46,17 +46,6 @@ def clients():
     return jsonify(clean_records(records))
 
 
-@app.route("/client/<record_id>", methods=["GET"])
-def client_detail(record_id):
-    record = get_record(record_id)
-
-    if "id" not in record:
-        return jsonify({"error": "Record not found"}), 404
-
-    return jsonify({
-        "id": record["id"],
-        **record.get("fields", {})
-    })
 
 
 @app.route("/client", methods=["POST"])
@@ -226,6 +215,15 @@ def opportunites_html():
 def commercial_html():
     return send_from_directory(".", "commercial.html")
     
+@app.route("/client/<siret>", methods=["GET"])
+def client_by_siret(siret):
+    records = get_records(formula=f"{{siret}}='{siret}'")
+    if not records or isinstance(records, dict):
+        return jsonify({"error": "not found"}), 404
+    r = records[0]
+    return jsonify({"id": r["id"], **r.get("fields", {})})
+
+
 # =========================================
 # 🔥 ROUTE GENERIQUE (TOUJOURS EN DERNIER)
 # =========================================
