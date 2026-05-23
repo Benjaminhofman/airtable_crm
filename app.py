@@ -222,6 +222,11 @@ def opportunites_html():
 def commercial_html():
     return send_from_directory(".", "commercial.html")
     
+@app.route("/gestion-clients.html")
+def gestion_clients_html():
+    return send_from_directory(".", "gestion-clients.html")
+
+
 @app.route("/client/<siret>", methods=["GET"])
 def client_by_siret(siret):
     records = get_records(formula=f"{{siret}}='{siret}'")
