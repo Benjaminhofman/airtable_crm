@@ -216,8 +216,8 @@ async function loadClient() {
     const res = await fetch(API_URL + "/client/" + siret);
     const data = await res.json();
 
-    const createLink = data.creer_client;
-    const editLink = data.lien_modification;
+    const createLink = data["creer client"];
+    const editLink = data["lien modification"];
 
     const createBtn = document.getElementById("create-link");
     const editBtn = document.getElementById("edit-link");
@@ -229,90 +229,89 @@ async function loadClient() {
     else editBtn.classList.add("disabled");
 
     // 🔥 CALCULS
-    const tempsPasse = parseFloat(data.temps_passe) || 0;
-    const honoraires = parseFloat(data.honoraires_cpta) || 0;
+    const tempsPasse = parseFloat(data["temps passé"]) || 0;
+    const honoraires = parseFloat(data["honoraires cpta"]) || 0;
     const tauxHoraire = tempsPasse > 0 ? (honoraires / tempsPasse) : 0;
 
     let html = "";
 
     html += block("🧾 Identification client",
-        field("Nom client", data.nom_client, "highlight") +
-        field("Activité", data.activite_r, "highlight") +
-        field("Code client", data.code_client) +
-        field("Année", data.annee) +
-        field("Date de clôture", data.date_de_cloture) +
-        field("Date entrée", data.date_entree) +
+        field("Nom client", data["nom client"], "highlight") +
+        field("Activité", data["activite R"], "highlight") +
+        field("Code client", data["code client"]) +
+        field("Année", data["année"]) +
+        field("Date de clôture", data["date de cloture"]) +
+        field("Date entrée", data["date entree"]) +
         field("Anniversaire", data["anniversaire"]) +
-        field("Structure", data.structure) +
-        field("Age", data.age) +
+        field("Structure", data["structure"]) +
+        field("Age", data["age"]) +
         field("Ancienneté", data["ancienneté"]) +
-        field("Mode d'entrée", data.mode_dentree) +
-        field("Assistant", data.assistant) +
-        field("Collaborateur", data.collaborateur) +
+        field("Mode d'entrée", data["mode d'entrée"]) +
+        field("Assistant", data["assistant"]) +
+        field("Collaborateur", data["collaborateur"]) +
         field("Honoraires", honoraires) +
 
-        // 🔥 AJOUTS PROPRES
-        field("IR", data.mai_ir) +
+        field("IR", data["mai IR"]) +
         field("Temps passé (h)", tempsPasse, "kpi-taux") +
         field("Taux horaire (€ / h)", tauxHoraire.toFixed(2), "kpi-taux") +
 
-        field("Prestation", data.prestation) +
-        field("Achat revente", data.achat_revente) +
-        field("Prevoyance", data.prevoyance) +
-        field("Exo entreprise nouvelle", data.exo_entre_nouvelle) +
-        field("Souhait anniversaire", data.souhait_anniversaire)
+        field("Prestation", data["prestation"]) +
+        field("Achat revente", data["achat revente"]) +
+        field("Prévoyance", data["prevoyance"]) +
+        field("Exo entreprise nouvelle", data["exo entreprise nouvelle"]) +
+        field("Souhait anniversaire", data["souhait anniversaire"])
     );
 
     html += block("📝 Commentaire",
-        field("Commentaire", data.commentaire)
+        field("Commentaire", data["commentaire"])
     );
 
     html += block("📞 Contact client",
-        field("Contact", data.contact) +
-        field("Téléphone", data.tel) +
-        field("Email", data.e_mail)
+        field("Contact", data["contact"]) +
+        field("Téléphone", data["tel"]) +
+        field("Email", data["e-mail"])
     );
 
     html += block("📊 Déclarations",
-        field("CA12", data.ca12) +
-        field("TVS", data.tvs) +
-        field("CVAE", data.cvae) +
-        field("IR", data.impot_sur_le_revenu) +
-        field("IS", data.is) +
-        field("Liasse", data.liasse) +
-        field("CFE", data.cotisation_fonciere_des_entreprises)
+        field("CA12", data["CA12"]) +
+        field("TVS", data["TVS"]) +
+        field("CVAE", data["CVAE"]) +
+        field("IR", data["impot sur le revenu"]) +
+        field("IS", data["IS"]) +
+        field("Liasse", data["liasse"]) +
+        field("CFE", data["Cotisation foncière entreprise"])
     );
 
     html += block("🚀 Missions exceptionnelles",
-        field("Juridique", data.juridique_exceptionnel) +
-        field("Prévisionnel", data.previsionnel) +
-        field("Eval", data.eval) +
-        field("Prévoyance S", data.prevoyance_s) +
-        field("Patrimoniale", data.patrimoniale) +
-        field("Placement", data.placement)
+        field("Juridique", data["juridique exceptionnel"]) +
+        field("Prévisionnel", data["previsionnel"]) +
+        field("Eval", data["eval"]) +
+        field("Prévoyance S", data["prevoyance S"]) +
+        field("Patrimoniale", data["patrimoniale"]) +
+        field("Placement", data["placement"])
     );
 
     html += block("⚙️ Missions de gestion",
-        field("Situation", data.situation) +
-        field("TBB", data.tbb)
+        field("Situation", data["situation"]) +
+        field("TBB", data["tbb"])
     );
 
     html += block("💰 Chiffres clés",
-        field("CA", data.ca_r, "kpi-ca") +
-        field("Résultat", data.resultat, "kpi-resultat") +
-        field("Assurance", data.assurance_r) +
-        field("Déplacement", data.deplacement_r) +
-        field("Loyer", data.loyer_r) +
-        field("CFE", data.cfe_r) +
-        field("Publicité", data.publicite_r) +
-        field("Honoraires", data.honoraires_r) +
-        field("Banque", data.banque_r) +
-        field("Emprunt", data.emprunt_r) +
-        field("Masse salariale", data.m_salariale_r) +
-        field("Produits", data.produit_r) +
-        field("Charges", data.charge_r) +
-        field("Trésorerie", data.tresorerie_r) +
-        field("Code NAF", data.code_naf_r)
+        field("CA", data["CA R"], "kpi-ca") +
+        field("Résultat", data["resultat R"], "kpi-resultat") +
+        field("Assurance", data["assurance R"]) +
+        field("Déplacement", data["déplacement R"]) +
+        field("Loyer", data["loyer R"]) +
+        field("CFE", data["CFE R"]) +
+        field("Publicité", data["publicité R"]) +
+        field("Honoraires", data["honoraires R"]) +
+        field("Banque", data["banque R"]) +
+        field("Emprunt", data["emprunt R"]) +
+        field("Masse salariale", data["masse salariale R"]) +
+        field("Produits", data["produit R"]) +
+        field("Charges", data["charge R"]) +
+        field("Trésorerie", data["trésorerie R"]) +
+        field("Code NAF", data["code NAF R"])
     );
 
     document.getElementById("client-details").innerHTML = html;
