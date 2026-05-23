@@ -1,0 +1,1962 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestion Clients</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f4f6fb;
+    color: #2c3e50;
+    min-height: 100vh;
+}
+
+/* ── Header ── */
+.header {
+    background: #273c75;
+    color: white;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+.header h1 { font-size: 1.15rem; font-weight: 600; }
+.back-btn {
+    background: rgba(255,255,255,.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,.3);
+    padding: 7px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background .2s;
+}
+.back-btn:hover { background: rgba(255,255,255,.25); }
+
+/* ── Tabs ── */
+.tabs-bar {
+    background: #1e2f5e;
+    padding: 0 24px;
+    display: flex;
+    gap: 4px;
+}
+.tab-btn {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,.6);
+    padding: 13px 22px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    border-bottom: 3px solid transparent;
+    transition: color .15s, border-color .15s;
+    letter-spacing: .01em;
+}
+.tab-btn:hover { color: rgba(255,255,255,.9); }
+.tab-btn.active { color: #fff; border-bottom-color: #f39c12; }
+
+/* ── Layout ── */
+.container {
+    max-width: 920px;
+    margin: 28px auto;
+    padding: 0 20px 60px;
+}
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── Cards ── */
+.card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.07);
+    padding: 24px 28px;
+    margin-bottom: 18px;
+}
+.card-title {
+    font-size: .85rem;
+    font-weight: 700;
+    color: #273c75;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f2f5;
+}
+
+/* ── Form grid ── */
+.field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+.field-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.full { grid-column: 1 / -1; }
+
+.field-group { display: flex; flex-direction: column; gap: 5px; }
+
+label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+label .req { color: #e74c3c; margin-left: 2px; }
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="date"],
+input[type="search"],
+select {
+    padding: 9px 11px;
+    border: 1.5px solid #dde1e7;
+    border-radius: 7px;
+    font-size: 14px;
+    color: #2c3e50;
+    background: #fafbfc;
+    transition: border-color .2s, box-shadow .2s;
+    outline: none;
+    width: 100%;
+    font-family: inherit;
+}
+input:focus, select:focus {
+    border-color: #273c75;
+    box-shadow: 0 0 0 3px rgba(39,60,117,.1);
+    background: #fff;
+}
+
+/* ── Toggles ── */
+.toggles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+.toggle-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8f9fc;
+    padding: 10px 13px;
+    border-radius: 8px;
+    transition: background .15s;
+}
+.toggle-item:hover { background: #eef0f7; }
+.toggle-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #4a5568;
+}
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
+}
+.switch input { opacity: 0; width: 0; height: 0; }
+.sw-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: #cbd5e0;
+    border-radius: 22px;
+    transition: .25s;
+}
+.sw-slider::before {
+    content: "";
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: .25s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+.switch input:checked + .sw-slider { background: #27ae60; }
+.switch input:checked + .sw-slider::before { transform: translateX(18px); }
+
+/* ── Boutons ── */
+.form-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    padding-top: 16px;
+    margin-top: 4px;
+    border-top: 1px solid #f0f2f5;
+}
+.btn {
+    padding: 10px 28px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+    letter-spacing: .02em;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: #273c75; color: white; }
+.btn-primary:hover { background: #1e2f5e; }
+.btn-danger  { background: #e74c3c; color: white; }
+.btn-danger:hover  { background: #c0392b; }
+.btn-outline { background: white; color: #273c75; border: 1.5px solid #273c75; }
+.btn-outline:hover { background: #f4f6fb; }
+
+/* ── Feedback ── */
+.feedback {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    display: none;
+    margin-top: 4px;
+}
+.feedback.show { display: block; }
+.feedback.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.feedback.error   { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+.feedback.loading { background: #e2f0fb; color: #0c5460; border: 1px solid #bee5eb; }
+
+/* ── Search (onglet Modifier) ── */
+.search-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.search-row input { flex: 1; }
+.btn-search {
+    background: #273c75;
+    color: white;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background .2s;
+}
+.btn-search:hover { background: #1e2f5e; }
+
+.search-results {
+    border: 1.5px solid #dde1e7;
+    border-radius: 8px;
+    max-height: 210px;
+    overflow-y: auto;
+    margin-bottom: 18px;
+    display: none;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+}
+.search-results.open { display: block; }
+.sr-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f2f5;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background .12s;
+}
+.sr-item:last-child { border-bottom: none; }
+.sr-item:hover { background: #f4f6fb; }
+.sr-item strong { color: #273c75; }
+.sr-siret { font-family: monospace; font-size: 12px; color: #999; margin-left: auto; }
+
+/* ── Onglet Supprimer ── */
+.danger-hint { font-size: 13px; color: #888; margin-bottom: 16px; }
+
+.del-toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+.del-toolbar input { flex: 1; min-width: 200px; }
+.del-counter {
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    white-space: nowrap;
+    padding: 6px 12px;
+    background: #f0f2f5;
+    border-radius: 6px;
+}
+.del-table-wrapper {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    max-height: 520px;
+    overflow-y: auto;
+}
+.del-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+.del-table thead th {
+    background: #273c75;
+    color: white;
+    padding: 10px 12px;
+    text-align: left;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+.del-table thead th:first-child { cursor: default; width: 44px; }
+.del-table thead th:hover:not(:first-child) { background: #1e2f5e; }
+.del-table tbody tr { border-bottom: 1px solid #f0f2f5; transition: background .1s; }
+.del-table tbody tr:last-child { border-bottom: none; }
+.del-table tbody tr:hover { background: #f4f6fb; }
+.del-table tbody tr.selected { background: #fef3f2; }
+.del-table td { padding: 9px 12px; vertical-align: middle; }
+.del-table td code { font-family: monospace; font-size: 12px; color: #888; }
+.del-table td strong { color: #273c75; }
+.del-table input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: #e74c3c; }
+.del-empty { text-align: center; padding: 32px; color: #aaa; font-size: 14px; }
+
+/* ── Onglet Base de données ── */
+.db-toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+.db-toolbar input { flex: 1; min-width: 220px; }
+.db-info {
+    font-size: 13px;
+    color: #666;
+    white-space: nowrap;
+}
+.db-wrapper {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 560px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+}
+.db-table {
+    width: max-content;
+    min-width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.db-table thead th {
+    background: #273c75;
+    color: white;
+    padding: 9px 14px;
+    text-align: left;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    white-space: nowrap;
+    font-weight: 600;
+    letter-spacing: .02em;
+    cursor: pointer;
+    user-select: none;
+}
+.db-table thead th:hover { background: #1e2f5e; }
+.db-table thead th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+}
+.db-table tbody td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: white;
+}
+.db-table tbody tr:nth-child(even) td:first-child { background: #f8f9fc; }
+.db-table tbody tr:hover td:first-child { background: #dbe4f7; }
+.db-table thead th .sort-arrow { opacity: .5; font-size: 11px; margin-left: 4px; }
+.db-table thead th.sorted .sort-arrow { opacity: 1; }
+.db-table tbody tr {
+    cursor: pointer;
+    transition: background .1s;
+    border-bottom: 1px solid #f0f2f5;
+}
+.db-table tbody tr:nth-child(even) { background: #f8f9fc; }
+.db-table tbody tr:hover { background: #dbe4f7; }
+.db-table tbody tr:last-child { border-bottom: none; }
+.db-table td {
+    padding: 8px 14px;
+    white-space: nowrap;
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #2c3e50;
+}
+.db-table td:first-child { font-family: monospace; font-size: 12px; color: #888; }
+.db-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.db-pagination-info { font-size: 13px; color: #666; }
+.db-pagination-btns { display: flex; gap: 8px; }
+.btn-page {
+    background: white;
+    border: 1.5px solid #dde1e7;
+    color: #273c75;
+    padding: 7px 16px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background .15s, border-color .15s;
+}
+.btn-page:hover:not(:disabled) { background: #f4f6fb; border-color: #273c75; }
+.btn-page:disabled { opacity: .4; cursor: default; }
+.btn-page.active-page { background: #273c75; color: white; border-color: #273c75; }
+
+/* ── Filtres Base de données ── */
+.db-filters {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    padding: 14px 16px;
+    background: #f8f9fc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    margin-bottom: 14px;
+}
+.db-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.db-filter-group label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+.db-filter-group input,
+.db-filter-group select {
+    padding: 7px 9px;
+    border: 1.5px solid #dde1e7;
+    border-radius: 6px;
+    font-size: 13px;
+    width: 100%;
+    background: white;
+    color: #2c3e50;
+    font-family: inherit;
+    transition: border-color .15s;
+}
+.db-filter-group input:focus,
+.db-filter-group select:focus {
+    border-color: #273c75;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(39,60,117,.08);
+}
+.db-filter-group.span2 { grid-column: span 2; }
+.db-hono-range { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.btn-reset-filters {
+    background: white;
+    border: 1.5px solid #dde1e7;
+    color: #666;
+    padding: 8px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background .15s, border-color .15s, color .15s;
+}
+.btn-reset-filters:hover {
+    background: #fdecea;
+    border-color: #e74c3c;
+    color: #e74c3c;
+}
+.db-active-filters {
+    font-size: 12px;
+    color: #f39c12;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ── Boutons Export / Import ── */
+.btn-export, .btn-import {
+    border: none;
+    padding: 8px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background .15s, transform .1s;
+}
+.btn-export:active, .btn-import:active { transform: translateY(1px); }
+.btn-export { background: #27ae60; color: white; }
+.btn-export:hover { background: #1e8449; }
+.btn-import { background: #2980b9; color: white; }
+.btn-import:hover { background: #1f618d; }
+
+/* ── Modal Import ── */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+    background: white;
+    border-radius: 14px;
+    padding: 28px;
+    max-width: 860px;
+    width: 100%;
+    max-height: 88vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    animation: modal-in .2s ease;
+}
+@keyframes modal-in {
+    from { transform: translateY(18px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f2f5;
+}
+.modal-header h3 { color: #273c75; font-size: 1.05rem; font-weight: 700; }
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #888;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    line-height: 1;
+    transition: background .15s;
+}
+.modal-close:hover { background: #f0f2f5; color: #2c3e50; }
+.modal-info {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    background: #f0f7ff;
+    border-left: 4px solid #2980b9;
+    border-radius: 6px;
+}
+.modal-info strong { color: #273c75; }
+.modal-preview-wrap {
+    overflow-x: auto;
+    max-height: 280px;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    margin-bottom: 14px;
+}
+.modal-preview-table {
+    border-collapse: collapse;
+    font-size: 12px;
+    width: max-content;
+    min-width: 100%;
+}
+.modal-preview-table thead th {
+    background: #273c75;
+    color: white;
+    padding: 7px 12px;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+}
+.modal-preview-table tbody td {
+    padding: 6px 12px;
+    border-bottom: 1px solid #f0f2f5;
+    white-space: nowrap;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #2c3e50;
+}
+.modal-preview-table tbody tr:nth-child(even) { background: #f8f9fc; }
+.modal-more { font-size: 12px; color: #888; margin-top: 6px; }
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #f0f2f5;
+}
+
+/* ── Skeleton loader ── */
+.skeleton-cell {
+    height: 13px;
+    background: linear-gradient(90deg, #e8eaf0 25%, #f4f6fb 50%, #e8eaf0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.2s ease-in-out infinite;
+    border-radius: 4px;
+    width: 75%;
+}
+@keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ── Spinner ── */
+.spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin .6s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <a href="index.html" class="back-btn">⬅ Retour</a>
+    <h1>👤 Gestion des clients</h1>
+</div>
+
+<div class="tabs-bar">
+    <button class="tab-btn active" onclick="showTab('creer', this)">➕ Créer</button>
+    <button class="tab-btn"        onclick="showTab('modifier', this)">✏️ Modifier</button>
+    <button class="tab-btn"        onclick="showTab('supprimer', this)">🗑 Supprimer</button>
+    <button class="tab-btn"        onclick="showTab('base', this)">📋 Base de données</button>
+</div>
+
+<div class="container">
+
+<!-- ══════════════════════════════════════════════════════════════
+     ONGLET 1 — CRÉER
+═══════════════════════════════════════════════════════════════ -->
+<div id="tab-creer" class="tab-panel active">
+
+    <div class="card">
+        <div class="card-title">Identification</div>
+        <div class="field-grid">
+            <div class="field-group">
+                <label>SIRET <span class="req">*</span></label>
+                <input type="text" id="c-siret" placeholder="9 chiffres" maxlength="9" inputmode="numeric">
+            </div>
+            <div class="field-group">
+                <label>Nom client</label>
+                <input type="text" id="c-nom_client" placeholder="Raison sociale">
+            </div>
+            <div class="field-group">
+                <label>Code client</label>
+                <input type="text" id="c-code_client">
+            </div>
+            <div class="field-group">
+                <label>Structure</label>
+                <select id="c-structure">
+                    <option value="">-- Choisir --</option>
+                    <option>SAS</option>
+                    <option>SARL</option>
+                    <option>EI</option>
+                    <option>ASSO</option>
+                    <option>SCI</option>
+                </select>
+            </div>
+            <div class="field-group">
+                <label>Année</label>
+                <input type="text" id="c-annee" placeholder="ex : 2024">
+            </div>
+            <div class="field-group">
+                <label>Mode d'entrée</label>
+                <select id="c-mode_dentree">
+                    <option value="">-- Choisir --</option>
+                    <option>prescrit</option>
+                    <option>internet</option>
+                    <option>autre</option>
+                </select>
+            </div>
+            <div class="field-group">
+                <label>Date d'entrée</label>
+                <input type="date" id="c-date_entree">
+            </div>
+            <div class="field-group">
+                <label>Date de clôture</label>
+                <input type="date" id="c-date_de_cloture">
+            </div>
+            <div class="field-group">
+                <label>Anniversaire</label>
+                <input type="date" id="c-anniversaire">
+            </div>
+            <div class="field-group">
+                <label>Achat / Revente</label>
+                <select id="c-achat_revente">
+                    <option value="">-- Choisir --</option>
+                    <option>oui</option>
+                    <option>non</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Contact</div>
+        <div class="field-grid cols-3">
+            <div class="field-group">
+                <label>Contact</label>
+                <input type="text" id="c-contact" placeholder="Nom du contact">
+            </div>
+            <div class="field-group">
+                <label>Email</label>
+                <input type="email" id="c-e_mail" placeholder="email@exemple.fr">
+            </div>
+            <div class="field-group">
+                <label>Téléphone</label>
+                <input type="tel" id="c-tel" placeholder="06 00 00 00 00">
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Équipe &amp; Honoraires</div>
+        <div class="field-grid">
+            <div class="field-group">
+                <label>Collaborateur</label>
+                <input list="list-collaborateur" id="c-collaborateur" autocomplete="off" placeholder="Choisir ou saisir…">
+            </div>
+            <div class="field-group">
+                <label>Assistant</label>
+                <input list="list-assistant" id="c-assistant" autocomplete="off" placeholder="Choisir ou saisir…">
+            </div>
+            <div class="field-group">
+                <label>Honoraires comptabilité (€)</label>
+                <input type="number" id="c-honoraires_cpta" step="0.01" min="0">
+            </div>
+            <div class="field-group">
+                <label>Temps passé (h)</label>
+                <input type="number" id="c-temps_passe" step="0.5" min="0">
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Codes administratifs</div>
+        <div class="field-grid">
+            <div class="field-group">
+                <label>Code impôt gouv</label>
+                <input type="text" id="c-code_impot_gouv">
+            </div>
+            <div class="field-group">
+                <label>Code URSSAF</label>
+                <input type="text" id="c-code_urssaf">
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Missions &amp; Déclarations</div>
+        <div class="toggles-grid" id="toggles-creer"></div>
+    </div>
+
+    <div id="feedback-creer" class="feedback"></div>
+    <div class="form-footer">
+        <button class="btn btn-outline" onclick="resetForm('c')">Réinitialiser</button>
+        <button class="btn btn-primary" id="btn-creer" onclick="createClient()">➕ Créer le client</button>
+    </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     ONGLET 2 — MODIFIER
+═══════════════════════════════════════════════════════════════ -->
+<div id="tab-modifier" class="tab-panel">
+
+    <div class="card">
+        <div class="card-title">Rechercher un client</div>
+        <div class="search-row">
+            <input type="search" id="m-search" placeholder="🔍 Nom ou SIRET..." oninput="searchClients()">
+        </div>
+        <div class="search-results" id="search-results"></div>
+
+        <div id="m-selected-info" style="display:none; margin-bottom:16px; padding:10px 14px; background:#e8f0fe; border-radius:8px; font-size:14px; color:#273c75; font-weight:600;">
+            Client sélectionné : <span id="m-selected-label"></span>
+        </div>
+    </div>
+
+    <div id="m-form-wrapper" style="display:none;">
+
+        <div class="card">
+            <div class="card-title">Identification</div>
+            <div class="field-grid">
+                <div class="field-group">
+                    <label>SIRET (non modifiable)</label>
+                    <input type="text" id="m-siret" readonly style="background:#f1f2f6; color:#888; cursor:not-allowed;">
+                </div>
+                <div class="field-group">
+                    <label>Nom client</label>
+                    <input type="text" id="m-nom_client">
+                </div>
+                <div class="field-group">
+                    <label>Code client</label>
+                    <input type="text" id="m-code_client">
+                </div>
+                <div class="field-group">
+                    <label>Structure</label>
+                    <select id="m-structure">
+                        <option value="">-- Choisir --</option>
+                        <option>SAS</option>
+                        <option>SARL</option>
+                        <option>EI</option>
+                        <option>ASSO</option>
+                        <option>SCI</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label>Année</label>
+                    <input type="text" id="m-annee">
+                </div>
+                <div class="field-group">
+                    <label>Mode d'entrée</label>
+                    <select id="m-mode_dentree">
+                        <option value="">-- Choisir --</option>
+                        <option>prescrit</option>
+                        <option>internet</option>
+                        <option>autre</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label>Date d'entrée</label>
+                    <input type="date" id="m-date_entree">
+                </div>
+                <div class="field-group">
+                    <label>Date de clôture</label>
+                    <input type="date" id="m-date_de_cloture">
+                </div>
+                <div class="field-group">
+                    <label>Anniversaire</label>
+                    <input type="date" id="m-anniversaire">
+                </div>
+                <div class="field-group">
+                    <label>Achat / Revente</label>
+                    <select id="m-achat_revente">
+                        <option value="">-- Choisir --</option>
+                        <option>oui</option>
+                        <option>non</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Contact</div>
+            <div class="field-grid cols-3">
+                <div class="field-group">
+                    <label>Contact</label>
+                    <input type="text" id="m-contact">
+                </div>
+                <div class="field-group">
+                    <label>Email</label>
+                    <input type="email" id="m-e_mail">
+                </div>
+                <div class="field-group">
+                    <label>Téléphone</label>
+                    <input type="tel" id="m-tel">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Équipe &amp; Honoraires</div>
+            <div class="field-grid">
+                <div class="field-group">
+                    <label>Collaborateur</label>
+                    <input list="list-collaborateur" id="m-collaborateur" autocomplete="off" placeholder="Choisir ou saisir…">
+                </div>
+                <div class="field-group">
+                    <label>Assistant</label>
+                    <input list="list-assistant" id="m-assistant" autocomplete="off" placeholder="Choisir ou saisir…">
+                </div>
+                <div class="field-group">
+                    <label>Honoraires comptabilité (€)</label>
+                    <input type="number" id="m-honoraires_cpta" step="0.01" min="0">
+                </div>
+                <div class="field-group">
+                    <label>Temps passé (h)</label>
+                    <input type="number" id="m-temps_passe" step="0.5" min="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Codes administratifs</div>
+            <div class="field-grid">
+                <div class="field-group">
+                    <label>Code impôt gouv</label>
+                    <input type="text" id="m-code_impot_gouv">
+                </div>
+                <div class="field-group">
+                    <label>Code URSSAF</label>
+                    <input type="text" id="m-code_urssaf">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Missions &amp; Déclarations</div>
+            <div class="toggles-grid" id="toggles-modifier"></div>
+        </div>
+
+        <div id="feedback-modifier" class="feedback"></div>
+        <div class="form-footer">
+            <button class="btn btn-outline" onclick="clearModifySelection()">Changer de client</button>
+            <button class="btn btn-primary" id="btn-modifier" onclick="updateClient()">💾 Enregistrer</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     ONGLET 3 — SUPPRIMER
+═══════════════════════════════════════════════════════════════ -->
+<div id="tab-supprimer" class="tab-panel">
+
+    <div class="card">
+        <div class="card-title" style="color:#c0392b; border-bottom-color:#f5c6cb;">🗑 Suppression de clients</div>
+        <p class="danger-hint">Cochez les clients à supprimer puis cliquez sur "Supprimer la sélection". Cette action est irréversible.</p>
+
+        <div class="del-toolbar">
+            <input type="search" id="s-filter" placeholder="🔍 Filtrer par nom ou SIRET..." oninput="filterDeleteTable()">
+            <span class="del-counter" id="del-counter">0 sélectionné(s)</span>
+            <button class="btn btn-danger" id="btn-supprimer" onclick="deleteSelection()" disabled>
+                🗑 Supprimer la sélection
+            </button>
+        </div>
+
+        <div id="feedback-supprimer" class="feedback" style="margin-bottom:12px;"></div>
+
+        <div class="del-table-wrapper">
+            <table class="del-table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="del-check-all" onchange="toggleAllDelete(this)" title="Tout sélectionner"></th>
+                        <th onclick="sortDeleteTable('siret')">SIRET</th>
+                        <th onclick="sortDeleteTable('nom_client')">Nom client</th>
+                        <th onclick="sortDeleteTable('collaborateur')">Collaborateur</th>
+                        <th onclick="sortDeleteTable('ca_r')">CA</th>
+                    </tr>
+                </thead>
+                <tbody id="del-tbody">
+                    <tr><td colspan="5" class="del-empty">Chargement…</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     ONGLET 4 — BASE DE DONNÉES
+═══════════════════════════════════════════════════════════════ -->
+<div id="tab-base" class="tab-panel">
+
+    <div class="card">
+        <div class="card-title">📋 Base de données clients</div>
+
+        <div class="db-toolbar">
+            <input type="search" id="db-search"
+                   placeholder="🔍 Nom, SIRET, collaborateur…"
+                   oninput="dbFilter()">
+            <span class="db-active-filters" id="db-active-filters"></span>
+            <span class="db-info" id="db-info">—</span>
+            <button class="btn-reset-filters" onclick="dbResetFilters()">✕ Réinitialiser</button>
+            <button class="btn-export" onclick="dbExportCSV()">⬇ Export CSV</button>
+            <button class="btn-import" onclick="triggerImport()">⬆ Import CSV</button>
+        </div>
+
+        <div class="db-filters">
+            <div class="db-filter-group">
+                <label>Année</label>
+                <input type="text" id="dbf-annee" placeholder="ex : 2024" oninput="dbFilter()">
+            </div>
+            <div class="db-filter-group">
+                <label>Structure</label>
+                <select id="dbf-structure" onchange="dbFilter()">
+                    <option value="">Toutes</option>
+                    <option>SAS</option><option>SARL</option><option>EI</option>
+                    <option>ASSO</option><option>SCI</option>
+                </select>
+            </div>
+            <div class="db-filter-group">
+                <label>Collaborateur</label>
+                <select id="dbf-collaborateur" onchange="dbFilter()">
+                    <option value="">Tous</option>
+                </select>
+            </div>
+            <div class="db-filter-group">
+                <label>Assistant</label>
+                <select id="dbf-assistant" onchange="dbFilter()">
+                    <option value="">Tous</option>
+                </select>
+            </div>
+            <div class="db-filter-group">
+                <label>Honoraires min (€)</label>
+                <input type="number" id="dbf-hono-min" placeholder="0" min="0" step="100" oninput="dbFilter()">
+            </div>
+            <div class="db-filter-group">
+                <label>Honoraires max (€)</label>
+                <input type="number" id="dbf-hono-max" placeholder="∞" min="0" step="100" oninput="dbFilter()">
+            </div>
+            <div class="db-filter-group">
+                <label>Date de clôture</label>
+                <input type="date" id="dbf-date_de_cloture" onchange="dbFilter()">
+            </div>
+            <div class="db-filter-group">
+                <label>Activité</label>
+                <select id="dbf-activite_r" onchange="dbFilter()">
+                    <option value="">Toutes</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="db-wrapper">
+            <table class="db-table">
+                <thead id="db-thead"><tr></tr></thead>
+                <tbody id="db-tbody">
+                    <tr><td colspan="99" style="text-align:center;padding:32px;color:#aaa;">Chargement…</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="db-pagination">
+            <span class="db-pagination-info" id="db-page-info"></span>
+            <div class="db-pagination-btns">
+                <button class="btn-page" id="db-prev" onclick="dbChangePage(-1)">← Précédent</button>
+                <button class="btn-page" id="db-next" onclick="dbChangePage(+1)">Suivant →</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</div><!-- /container -->
+
+<script>
+const API_URL = "";
+
+// ── Champs toggle partagés entre Créer et Modifier ────────────────────────────
+const TOGGLE_FIELDS = [
+    { id: "liasse",                            field: "liasse",                           label: "Liasse" },
+    { id: "ca12",                              field: "CA12",                             label: "CA12" },
+    { id: "is",                                field: "IS",                               label: "IS" },
+    { id: "impot_sur_le_revenu",               field: "impot sur le revenu",              label: "IR" },
+    { id: "cvae",                              field: "CVAE",                             label: "CVAE" },
+    { id: "tvs",                               field: "TVS",                              label: "TVS" },
+    { id: "situation",                         field: "situation",                        label: "Situation" },
+    { id: "tbb",                               field: "tbb",                              label: "TBB" },
+    { id: "juridique_exceptionnel",            field: "juridique exceptionnel",           label: "Juridique" },
+    { id: "exo_entre_nouvelle",                field: "exo entreprise nouvelle",          label: "Exo entr. nouvelle" },
+    { id: "cotisation_fonciere_des_entreprises", field: "Cotisation foncière entreprise", label: "CFE" },
+];
+
+// ── Champs texte/date/number partagés ────────────────────────────────────────
+const TEXT_FIELDS = [
+    { id: "siret",           field: "siret" },
+    { id: "nom_client",      field: "nom client" },
+    { id: "code_client",     field: "code client" },
+    { id: "structure",       field: "structure" },
+    { id: "annee",           field: "année" },
+    { id: "mode_dentree",    field: "mode d'entrée" },
+    { id: "date_entree",     field: "date entree" },
+    { id: "date_de_cloture", field: "date de cloture" },
+    { id: "anniversaire",    field: "anniversaire" },
+    { id: "achat_revente",   field: "achat revente" },
+    { id: "contact",         field: "contact" },
+    { id: "e_mail",          field: "e-mail" },
+    { id: "tel",             field: "tel" },
+    { id: "collaborateur",   field: "collaborateur" },
+    { id: "assistant",       field: "assistant" },
+    { id: "honoraires_cpta", field: "honoraires cpta" },
+    { id: "temps_passe",     field: "temps passé" },
+    { id: "code_impot_gouv", field: "code impot gouv" },
+    { id: "code_urssaf",     field: "code URSSAF" },
+];
+
+// ── Initialisation des toggles ────────────────────────────────────────────────
+function buildToggles(containerId, prefix) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = TOGGLE_FIELDS.map(f => `
+        <div class="toggle-item">
+            <span class="toggle-label">${f.label}</span>
+            <label class="switch">
+                <input type="checkbox" id="${prefix}-${f.id}">
+                <span class="sw-slider"></span>
+            </label>
+        </div>
+    `).join('');
+}
+buildToggles('toggles-creer',    'c');
+buildToggles('toggles-modifier', 'm');
+
+// ── Navigation entre onglets ─────────────────────────────────────────────────
+function showTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (name === 'modifier' && !allClients.length) loadAllClients();
+    if (name === 'supprimer') loadDeleteTable();
+    if (name === 'base') loadBaseTab();
+}
+
+// ── Cache clients ─────────────────────────────────────────────────────────────
+let allClients = [];
+async function loadAllClients() {
+    try {
+        const res = await fetch(API_URL + "/clients");
+        allClients = await res.json();
+        populateCollaborateurList();
+        populateAssistantList();
+    } catch(e) {
+        console.error("Impossible de charger les clients", e);
+    }
+}
+
+function populateCollaborateurList() {
+    const dl = document.getElementById('list-collaborateur');
+    if (!dl) return;
+    const values = [...new Set(allClients.map(c => c.collaborateur).filter(Boolean))].sort();
+    dl.innerHTML = values.map(v => `<option value="${v}">`).join('');
+}
+
+function populateAssistantList() {
+    const dl = document.getElementById('list-assistant');
+    if (!dl) return;
+    const values = [...new Set(allClients.map(c => c.assistant).filter(Boolean))].sort();
+    dl.innerHTML = values.map(v => `<option value="${v}">`).join('');
+}
+
+// Chargement au démarrage pour que les datalists soient prêts dès l'onglet Créer
+loadAllClients();
+
+// ── Feedback helper ───────────────────────────────────────────────────────────
+function showFeedback(id, type, msg) {
+    const el = document.getElementById(id);
+    el.className = `feedback show ${type}`;
+    el.textContent = msg;
+    if (type === 'success') setTimeout(() => el.classList.remove('show'), 4000);
+}
+function hideFeedback(id) {
+    document.getElementById(id).classList.remove('show');
+}
+
+// ── Collecte des données d'un formulaire ──────────────────────────────────────
+function collectForm(prefix) {
+    const data = {};
+    TEXT_FIELDS.forEach(f => {
+        if (f.id === 'siret' && prefix === 'm') return; // siret lu séparément
+        const el = document.getElementById(`${prefix}-${f.id}`);
+        if (!el) return;
+        const v = el.value.trim();
+        if (v !== '') data[f.field] = v;
+    });
+    TOGGLE_FIELDS.forEach(f => {
+        const el = document.getElementById(`${prefix}-${f.id}`);
+        if (el) data[f.field] = el.checked;
+    });
+    return data;
+}
+
+// ── Remise à zéro ─────────────────────────────────────────────────────────────
+function resetForm(prefix) {
+    TEXT_FIELDS.forEach(f => {
+        const el = document.getElementById(`${prefix}-${f.id}`);
+        if (el) el.value = '';
+    });
+    TOGGLE_FIELDS.forEach(f => {
+        const el = document.getElementById(`${prefix}-${f.id}`);
+        if (el) el.checked = false;
+    });
+    hideFeedback(`feedback-${prefix === 'c' ? 'creer' : 'modifier'}`);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ONGLET 1 — CRÉER
+// ══════════════════════════════════════════════════════════════════════════════
+
+async function createClient() {
+    const siret = document.getElementById('c-siret').value.trim();
+    if (!siret) {
+        showFeedback('feedback-creer', 'error', '⚠️ Le SIRET est obligatoire.');
+        document.getElementById('c-siret').focus();
+        return;
+    }
+    if (!/^\d{9}$/.test(siret)) {
+        showFeedback('feedback-creer', 'error', '⚠️ Le SIRET doit contenir exactement 9 chiffres.');
+        return;
+    }
+
+    const btn = document.getElementById('btn-creer');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Création…';
+    showFeedback('feedback-creer', 'loading', 'Création en cours…');
+
+    const body = { siret, ...collectForm('c') };
+
+    try {
+        const res = await fetch(API_URL + "/client", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+        });
+        const json = await res.json();
+        if (!res.ok) {
+            showFeedback('feedback-creer', 'error', `❌ ${json.detail || 'Erreur serveur'}`);
+        } else {
+            showFeedback('feedback-creer', 'success', `✅ Client ${siret} créé avec succès !`);
+            resetForm('c');
+            allClients = []; // invalide le cache
+        }
+    } catch(e) {
+        showFeedback('feedback-creer', 'error', `❌ Erreur réseau : ${e.message}`);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '➕ Créer le client';
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ONGLET 2 — MODIFIER
+// ══════════════════════════════════════════════════════════════════════════════
+
+let selectedSiret = null;
+
+function searchClients() {
+    const q = document.getElementById('m-search').value.trim().toLowerCase();
+    const box = document.getElementById('search-results');
+    if (!q || q.length < 2) { box.classList.remove('open'); return; }
+    if (!allClients.length) { loadAllClients().then(() => searchClients()); return; }
+
+    const matches = allClients.filter(c =>
+        (c["nom client"] || '').toLowerCase().includes(q) ||
+        (c["siret"] || '').includes(q)
+    ).slice(0, 8);
+
+    if (!matches.length) {
+        box.innerHTML = '<div class="sr-item" style="color:#999; cursor:default;">Aucun résultat</div>';
+    } else {
+        box.innerHTML = matches.map(c => `
+            <div class="sr-item" onclick="selectClient('${c["siret"]}')">
+                <strong>${c["nom client"] || '—'}</strong>
+                <span class="sr-siret">${c["siret"]}</span>
+            </div>
+        `).join('');
+    }
+    box.classList.add('open');
+}
+
+// Remplit le formulaire Modifier à partir d'un objet client (en mémoire ou API)
+function fillModifyForm(data) {
+    selectedSiret = data["siret"];
+
+    TEXT_FIELDS.forEach(f => {
+        const el = document.getElementById(`m-${f.id}`);
+        if (!el) return;
+        const v = data[f.field];
+        el.value = (v !== null && v !== undefined) ? String(v) : '';
+    });
+
+    TOGGLE_FIELDS.forEach(f => {
+        const el = document.getElementById(`m-${f.id}`);
+        if (el) el.checked = !!data[f.field];
+    });
+
+    document.getElementById('m-selected-label').textContent =
+        `${data["nom client"] || '—'} (${data["siret"]})`;
+    document.getElementById('m-selected-info').style.display = 'block';
+    document.getElementById('m-form-wrapper').style.display = 'block';
+    hideFeedback('feedback-modifier');
+    // Scroll vers le formulaire
+    document.getElementById('m-form-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+async function selectClient(siret) {
+    document.getElementById('search-results').classList.remove('open');
+    document.getElementById('m-search').value = '';
+    showFeedback('feedback-modifier', 'loading', 'Chargement de la fiche…');
+    document.getElementById('m-form-wrapper').style.display = 'none';
+
+    try {
+        const res = await fetch(API_URL + "/client/" + siret);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        fillModifyForm(data);
+    } catch(e) {
+        showFeedback('feedback-modifier', 'error', `❌ Impossible de charger le client : ${e.message}`);
+    }
+}
+
+function clearModifySelection() {
+    selectedSiret = null;
+    document.getElementById('m-form-wrapper').style.display = 'none';
+    document.getElementById('m-selected-info').style.display = 'none';
+    hideFeedback('feedback-modifier');
+    resetForm('m');
+}
+
+async function updateClient() {
+    if (!selectedSiret) {
+        showFeedback('feedback-modifier', 'error', '⚠️ Aucun client sélectionné.');
+        return;
+    }
+
+    const btn = document.getElementById('btn-modifier');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Enregistrement…';
+    showFeedback('feedback-modifier', 'loading', 'Enregistrement en cours…');
+
+    const body = { siret: selectedSiret, ...collectForm('m') };
+
+    try {
+        // Résolution du record_id Airtable depuis le siret
+        const recRes = await fetch(API_URL + "/client/" + selectedSiret);
+        if (!recRes.ok) throw new Error("Client introuvable");
+        const recData = await recRes.json();
+        const recordId = recData.id;
+
+        const res = await fetch(API_URL + "/client/" + recordId, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+        });
+        const json = await res.json();
+        if (!res.ok) {
+            showFeedback('feedback-modifier', 'error', `❌ ${json.error || 'Erreur serveur'}`);
+        } else {
+            showFeedback('feedback-modifier', 'success', `✅ Client mis à jour.`);
+            allClients = []; // invalide le cache
+        }
+    } catch(e) {
+        showFeedback('feedback-modifier', 'error', `❌ Erreur réseau : ${e.message}`);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '💾 Enregistrer';
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ONGLET 3 — SUPPRIMER
+// ══════════════════════════════════════════════════════════════════════════════
+
+let delFiltered = [];
+let delSortCol  = 'nom client';
+let delSortAsc  = true;
+
+async function loadDeleteTable() {
+    if (!allClients.length) await loadAllClients();
+    delFiltered = [...allClients];
+    document.getElementById('s-filter').value = '';
+    document.getElementById('del-check-all').checked = false;
+    renderDeleteTable();
+}
+
+function filterDeleteTable() {
+    const q = document.getElementById('s-filter').value.trim().toLowerCase();
+    delFiltered = allClients.filter(c =>
+        !q ||
+        (c["nom client"] || '').toLowerCase().includes(q) ||
+        (c["siret"] || '').includes(q)
+    );
+    document.getElementById('del-check-all').checked = false;
+    renderDeleteTable();
+}
+
+function sortDeleteTable(col) {
+    if (delSortCol === col) delSortAsc = !delSortAsc;
+    else { delSortCol = col; delSortAsc = true; }
+    renderDeleteTable();
+}
+
+function renderDeleteTable() {
+    const sorted = [...delFiltered].sort((a, b) => {
+        const va = String(a[delSortCol] ?? '');
+        const vb = String(b[delSortCol] ?? '');
+        return va.localeCompare(vb, 'fr', { numeric: true }) * (delSortAsc ? 1 : -1);
+    });
+
+    const fmt = n => n ? Number(n).toLocaleString('fr-FR', { maximumFractionDigits: 0 }) + ' €' : '—';
+    const arrow = col => delSortCol === col ? (delSortAsc ? ' ▲' : ' ▼') : '';
+
+    // Mise à jour des flèches de tri dans les en-têtes
+    ['siret','nom client','collaborateur','CA R'].forEach(col => {
+        const th = document.querySelector(`.del-table th[onclick="sortDeleteTable('${col}')"]`);
+        if (th) th.textContent = { siret:'SIRET', 'nom client':'Nom client', collaborateur:'Collaborateur', 'CA R':'CA' }[col] + arrow(col);
+    });
+
+    const tbody = document.getElementById('del-tbody');
+    if (!sorted.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="del-empty">Aucun client trouvé.</td></tr>';
+        updateDelCounter();
+        return;
+    }
+
+    tbody.innerHTML = sorted.map(c => `
+        <tr>
+            <td><input type="checkbox" class="del-check" value="${c["siret"]}" onchange="updateDelCounter()"></td>
+            <td><code>${c["siret"] || ''}</code></td>
+            <td><strong>${c["nom client"] || '—'}</strong></td>
+            <td>${c["collaborateur"] || '—'}</td>
+            <td>${fmt(c["CA R"])}</td>
+        </tr>
+    `).join('');
+
+    updateDelCounter();
+}
+
+function toggleAllDelete(cb) {
+    document.querySelectorAll('.del-check').forEach(c => c.checked = cb.checked);
+    updateDelCounter();
+}
+
+function updateDelCounter() {
+    const n = document.querySelectorAll('.del-check:checked').length;
+    document.getElementById('del-counter').textContent = `${n} sélectionné(s)`;
+    document.getElementById('btn-supprimer').disabled = n === 0;
+}
+
+async function deleteSelection() {
+    const checked = [...document.querySelectorAll('.del-check:checked')];
+    if (!checked.length) return;
+
+    const sirets = checked.map(cb => cb.value);
+    const lines  = sirets.map(s => {
+        const c = allClients.find(x => x["siret"] === s);
+        return `• ${c ? (c["nom client"] || s) + ' (' + s + ')' : s}`;
+    });
+
+    if (!confirm(`Supprimer définitivement ${sirets.length} client(s) ?\n\n${lines.join('\n')}\n\nCette action est irréversible.`)) return;
+
+    const btn = document.getElementById('btn-supprimer');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Suppression…';
+    showFeedback('feedback-supprimer', 'loading', `Suppression de ${sirets.length} client(s) en cours…`);
+
+    let ok = 0;
+    const errors = [];
+    for (const siret of sirets) {
+        try {
+            const res = await fetch(API_URL + "/client/" + encodeURIComponent(siret), { method: "DELETE" });
+            if (res.ok) ok++;
+            else errors.push(siret);
+        } catch { errors.push(siret); }
+    }
+
+    allClients = [];
+    await loadDeleteTable();
+
+    if (errors.length === 0) {
+        showFeedback('feedback-supprimer', 'success', `✅ ${ok} client(s) supprimé(s) avec succès.`);
+    } else {
+        showFeedback('feedback-supprimer', 'error', `⚠️ ${ok} supprimé(s) — ${errors.length} erreur(s) : ${errors.join(', ')}`);
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '🗑 Supprimer la sélection';
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ONGLET 4 — BASE DE DONNÉES
+// ══════════════════════════════════════════════════════════════════════════════
+
+const DB_PAGE_SIZE    = 50;
+const DB_PRIORITY_COLS = ['siret','nom client','collaborateur','assistant','CA R','honoraires cpta','date de cloture'];
+let dbAllRows      = [];   // toutes les lignes (filtrées)
+let dbColumns      = [];   // noms de colonnes ordonnées
+let dbCurrentPage  = 1;
+let dbSortCol      = null;
+let dbSortAsc      = true;
+
+async function loadBaseTab() {
+    if (!allClients.length) {
+        const skeletonRow = '<tr>' + DB_PRIORITY_COLS.map(() =>
+            '<td><div class="skeleton-cell"></div></td>'
+        ).join('') + '</tr>';
+        document.getElementById('db-tbody').innerHTML = Array(12).fill(skeletonRow).join('');
+        document.getElementById('db-info').textContent = 'Chargement…';
+        await loadAllClients();
+    }
+    if (allClients.length) {
+        const allCols     = Object.keys(allClients[0]);
+        const prioritized = DB_PRIORITY_COLS.filter(c => allCols.includes(c));
+        const rest        = allCols.filter(c => !DB_PRIORITY_COLS.includes(c));
+        dbColumns = [...prioritized, ...rest];
+    } else {
+        dbColumns = [];
+    }
+    buildDbHeader();
+    populateDbFilters();
+    dbAllRows = [...allClients];
+    document.getElementById('db-search').value = '';
+    dbCurrentPage = 1;
+    renderDbTable();
+}
+
+// Alimente les selects dynamiques depuis les données en mémoire
+function populateDbFilters() {
+    const fill = (id, field) => {
+        const sel = document.getElementById(id);
+        if (!sel) return;
+        const saved = sel.value;
+        const vals  = [...new Set(allClients.map(c => c[field]).filter(Boolean))].sort(
+            (a, b) => String(a).localeCompare(String(b), 'fr')
+        );
+        sel.innerHTML = '<option value="">Tous</option>' +
+            vals.map(v => `<option value="${v}">${v}</option>`).join('');
+        if (saved) sel.value = saved;
+    };
+    fill('dbf-collaborateur', 'collaborateur');
+    fill('dbf-assistant',     'assistant');
+    fill('dbf-activite_r',    'activite R');
+}
+
+// Réinitialise tous les filtres et rafraîchit le tableau
+function dbResetFilters() {
+    ['db-search','dbf-annee','dbf-hono-min','dbf-hono-max','dbf-date_de_cloture'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    ['dbf-structure','dbf-collaborateur','dbf-assistant','dbf-activite_r'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    dbFilter();
+}
+
+function buildDbHeader() {
+    const tr = document.querySelector('#db-thead tr');
+    tr.innerHTML = dbColumns.map(col => `
+        <th onclick="dbSort('${col}')" data-col="${col}">
+            ${col} <span class="sort-arrow">↕</span>
+        </th>
+    `).join('');
+}
+
+function dbFilter() {
+    const q        = document.getElementById('db-search').value.trim().toLowerCase();
+    const annee    = document.getElementById('dbf-annee').value.trim();
+    const struct   = document.getElementById('dbf-structure').value;
+    const collab   = document.getElementById('dbf-collaborateur').value;
+    const assist   = document.getElementById('dbf-assistant').value;
+    const honoMin  = document.getElementById('dbf-hono-min').value  !== '' ? parseFloat(document.getElementById('dbf-hono-min').value)  : null;
+    const honoMax  = document.getElementById('dbf-hono-max').value  !== '' ? parseFloat(document.getElementById('dbf-hono-max').value)  : null;
+    const dateClo  = document.getElementById('dbf-date_de_cloture').value;
+    const activite = document.getElementById('dbf-activite_r').value;
+
+    dbAllRows = allClients.filter(c => {
+        if (q && !(
+            (c["nom client"]    || '').toLowerCase().includes(q) ||
+            (c["siret"]         || '').toLowerCase().includes(q) ||
+            (c["collaborateur"] || '').toLowerCase().includes(q)
+        )) return false;
+        if (annee    && String(c["année"]    || '').trim() !== annee) return false;
+        if (struct   && (c["structure"]      || '') !== struct)        return false;
+        if (collab   && (c["collaborateur"]  || '') !== collab)        return false;
+        if (assist   && (c["assistant"]      || '') !== assist)        return false;
+        if (honoMin  !== null && (parseFloat(c["honoraires cpta"]) || 0) < honoMin) return false;
+        if (honoMax  !== null && (parseFloat(c["honoraires cpta"]) || 0) > honoMax) return false;
+        if (dateClo  && !(c["date de cloture"] || '').startsWith(dateClo)) return false;
+        if (activite && (c["activite R"]     || '') !== activite)       return false;
+        return true;
+    });
+
+    // Indicateur de filtres actifs
+    const active = [q, annee, struct, collab, assist, honoMin, honoMax, dateClo, activite].filter(Boolean).length;
+    document.getElementById('db-active-filters').textContent =
+        active ? `${active} filtre(s) actif(s)` : '';
+
+    dbCurrentPage = 1;
+    renderDbTable();
+}
+
+function dbSort(col) {
+    if (dbSortCol === col) dbSortAsc = !dbSortAsc;
+    else { dbSortCol = col; dbSortAsc = true; }
+
+    // Mise à jour visuelle des flèches
+    document.querySelectorAll('#db-thead th').forEach(th => {
+        th.classList.remove('sorted');
+        th.querySelector('.sort-arrow').textContent = '↕';
+    });
+    const activeTh = document.querySelector(`#db-thead th[data-col="${col}"]`);
+    if (activeTh) {
+        activeTh.classList.add('sorted');
+        activeTh.querySelector('.sort-arrow').textContent = dbSortAsc ? '▲' : '▼';
+    }
+
+    dbAllRows.sort((a, b) => {
+        const va = String(a[col] ?? '');
+        const vb = String(b[col] ?? '');
+        return va.localeCompare(vb, 'fr', { numeric: true }) * (dbSortAsc ? 1 : -1);
+    });
+    dbCurrentPage = 1;
+    renderDbTable();
+}
+
+function dbChangePage(delta) {
+    const totalPages = Math.max(1, Math.ceil(dbAllRows.length / DB_PAGE_SIZE));
+    dbCurrentPage = Math.min(totalPages, Math.max(1, dbCurrentPage + delta));
+    renderDbTable();
+}
+
+function renderDbTable() {
+    const total      = dbAllRows.length;
+    const totalPages = Math.max(1, Math.ceil(total / DB_PAGE_SIZE));
+    const start      = (dbCurrentPage - 1) * DB_PAGE_SIZE;
+    const pageRows   = dbAllRows.slice(start, start + DB_PAGE_SIZE);
+
+    // Info
+    document.getElementById('db-info').textContent =
+        total ? `${pageRows.length} affiché(s) / ${total} total` : '0 client';
+    document.getElementById('db-page-info').textContent =
+        total ? `Page ${dbCurrentPage} / ${totalPages}  (lignes ${start + 1}–${Math.min(start + DB_PAGE_SIZE, total)})` : '';
+
+    // Boutons pagination
+    document.getElementById('db-prev').disabled = dbCurrentPage <= 1;
+    document.getElementById('db-next').disabled = dbCurrentPage >= totalPages;
+
+    // Corps du tableau
+    const tbody = document.getElementById('db-tbody');
+    if (!pageRows.length) {
+        tbody.innerHTML = '<tr><td colspan="99" style="text-align:center;padding:32px;color:#aaa;">Aucun résultat.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = pageRows.map(c => {
+        const cells = dbColumns.map(col => {
+            let v = c[col];
+            if (v === null || v === undefined) v = '';
+            // Booléen
+            if (typeof v === 'boolean') v = v ? 'oui' : 'non';
+            const safe = String(v).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return `<td title="${safe}">${safe}</td>`;
+        }).join('');
+        return `<tr onclick="dbOpenModify('${c.siret}')">${cells}</tr>`;
+    }).join('');
+}
+
+function dbOpenModify(siret) {
+    const btn = document.querySelector('.tab-btn[onclick="showTab(\'modifier\', this)"]');
+    showTab('modifier', btn);
+    // Utilise les données en cache si disponibles — évite un aller-retour API
+    const cached = allClients.find(c => c.siret === siret);
+    if (cached) {
+        fillModifyForm(cached);
+    } else {
+        selectClient(siret);
+    }
+}
+
+// ── Fermer le dropdown recherche (onglet Modifier) au clic extérieur ──────────
+document.addEventListener('click', e => {
+    if (!e.target.closest('#m-search') && !e.target.closest('#search-results'))
+        document.getElementById('search-results').classList.remove('open');
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// EXPORT CSV
+// ══════════════════════════════════════════════════════════════════════════════
+
+function dbExportCSV() {
+    if (!dbAllRows.length) { alert("Aucune donnée à exporter."); return; }
+    const cols   = dbColumns.length ? dbColumns : Object.keys(dbAllRows[0]);
+    const header = cols.map(c => '"' + c.replace(/"/g, '""') + '"').join(';');
+    const rows   = dbAllRows.map(r =>
+        cols.map(c => {
+            let v = r[c] ?? '';
+            if (typeof v === 'boolean') v = v ? 'oui' : 'non';
+            return '"' + String(v).replace(/"/g, '""') + '"';
+        }).join(';')
+    );
+    const csv  = '﻿' + [header, ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `clients_export_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// IMPORT CSV
+// ══════════════════════════════════════════════════════════════════════════════
+
+let importRows    = [];
+let dbColumnTypes = null; // cache { col_name: 'boolean'|'numeric'|'date'|'text' }
+
+// Convertit DD/MM/YYYY → YYYY-MM-DD ; laisse inchangé tout autre format
+function convertDate(val) {
+    if (!val) return val;
+    const m = String(val).match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (m) return m[3] + '-' + m[2] + '-' + m[1];
+    return val;
+}
+
+// Convertit les valeurs booléennes texte → boolean JS ; laisse inchangé tout autre valeur
+function convertBool(val) {
+    if (typeof val !== 'string') return val;
+    const v = val.toLowerCase().trim();
+    if (v === 'oui' || v === 'true'  || v === '1') return true;
+    if (v === 'non' || v === 'false' || v === '0') return false;
+    return val;
+}
+
+// Charge et met en cache les types PostgreSQL des colonnes de la table clients
+async function fetchColumnTypes() {
+    if (dbColumnTypes) return dbColumnTypes;
+    try {
+        const res  = await fetch(API_URL + "/clients/columns");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const cols = await res.json();
+        const NUMERIC = ['numeric','integer','bigint','smallint','real','double precision','decimal','money'];
+        const DATE    = ['date','timestamp'];
+        dbColumnTypes = {};
+        cols.forEach(({ column_name, data_type }) => {
+            const dt = (data_type || '').toLowerCase();
+            if      (dt === 'boolean')                    dbColumnTypes[column_name] = 'boolean';
+            else if (NUMERIC.some(t => dt.includes(t)))  dbColumnTypes[column_name] = 'numeric';
+            else if (DATE.some(t => dt.includes(t)))     dbColumnTypes[column_name] = 'date';
+            else                                          dbColumnTypes[column_name] = 'text';
+        });
+    } catch(e) {
+        console.error("fetchColumnTypes :", e);
+        dbColumnTypes = {};  // fallback : tout traité comme text
+    }
+    return dbColumnTypes;
+}
+
+// Convertit une valeur CSV selon le type réel de la colonne PostgreSQL
+// Retourne null pour les valeurs vides ou invalides (le backend les ignorera)
+function convertFieldByType(val, type) {
+    const s = (val === null || val === undefined) ? '' : String(val).trim();
+    if (s === '') return null;
+    switch (type) {
+        case 'boolean': {
+            const v = s.toLowerCase();
+            if (v === 'oui' || v === 'true'  || v === '1') return true;
+            if (v === 'non' || v === 'false' || v === '0') return false;
+            return null;  // valeur non reconnue → ne pas envoyer
+        }
+        case 'numeric': {
+            const n = parseFloat(s.replace(',', '.').replace(/\s/g, ''));
+            return isNaN(n) ? null : n;
+        }
+        case 'date':
+            return convertDate(s);
+        default:
+            return s;
+    }
+}
+
+function triggerImport() {
+    document.getElementById('csv-file-input').click();
+}
+
+// Parseur CSV robuste : gère les champs entre guillemets, séparateurs ; et ,
+function parseCSV(text) {
+    if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1); // BOM
+    const lines = text.split(/\r?\n/).filter(l => l.trim());
+    if (!lines.length) return { headers: [], rows: [] };
+
+    const sep = lines[0].includes(';') ? ';' : ',';
+
+    function parseLine(line) {
+        const result = [];
+        let field = '', inQ = false;
+        for (let i = 0; i < line.length; i++) {
+            const ch = line[i];
+            if (ch === '"') {
+                if (inQ && line[i + 1] === '"') { field += '"'; i++; }
+                else inQ = !inQ;
+            } else if (ch === sep && !inQ) { result.push(field); field = ''; }
+            else field += ch;
+        }
+        result.push(field);
+        return result;
+    }
+
+    const headers = parseLine(lines[0]);
+    const rows = lines.slice(1).map(line => {
+        const vals = parseLine(line);
+        const obj = {};
+        headers.forEach((h, i) => { obj[h] = (vals[i] ?? '').trim(); });
+        return obj;
+    });
+    return { headers, rows };
+}
+
+function handleCSVFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    event.target.value = '';
+    const reader = new FileReader();
+    reader.onload = e => {
+        const { headers, rows } = parseCSV(e.target.result);
+        importRows = rows.filter(r => (r.siret || '').trim());
+        if (!importRows.length) {
+            alert("Aucune ligne avec SIRET détectée dans ce fichier.");
+            return;
+        }
+        openImportModal(headers, importRows);
+    };
+    reader.readAsText(file, 'UTF-8');
+}
+
+function openImportModal(headers, rows) {
+    // Info
+    document.getElementById('import-modal-info').innerHTML =
+        `<strong>${rows.length} ligne(s)</strong> détectée(s) &mdash; ` +
+        `<span>${headers.length} colonne(s)</span>. ` +
+        `L'import effectue un <strong>UPSERT</strong> : création si le SIRET est nouveau, ` +
+        `mise à jour sinon. Les cellules vides ne modifient pas l'existant.`;
+
+    // Aperçu des 5 premières lignes, 8 colonnes max
+    const previewCols = headers.slice(0, 8);
+    const previewRows = rows.slice(0, 5);
+
+    document.getElementById('import-preview-head').innerHTML =
+        '<tr>' + previewCols.map(h =>
+            `<th>${h.replace(/</g,'&lt;')}</th>`
+        ).join('') + '</tr>';
+
+    document.getElementById('import-preview-body').innerHTML =
+        previewRows.map(r =>
+            '<tr>' + previewCols.map(h => {
+                const v = String(r[h] ?? '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                return `<td title="${v}">${v}</td>`;
+            }).join('') + '</tr>'
+        ).join('');
+
+    document.getElementById('import-more').textContent =
+        rows.length > 5 ? `… et ${rows.length - 5} ligne(s) de plus` : '';
+
+    document.getElementById('import-feedback').classList.remove('show');
+    document.getElementById('btn-confirm-import').disabled = false;
+    document.getElementById('btn-confirm-import').textContent = '⬆ Confirmer l\'import';
+    document.getElementById('import-modal').classList.add('open');
+}
+
+function closeImportModal() {
+    document.getElementById('import-modal').classList.remove('open');
+    importRows = [];
+}
+
+async function confirmImport() {
+    if (!importRows.length) return;
+
+    // Conversion typée : récupère les types PostgreSQL puis applique la bonne conversion
+    const types   = await fetchColumnTypes();
+    const payload = importRows.map(r => {
+        const row = {};
+        Object.entries(r).forEach(([k, v]) => {
+            const converted = convertFieldByType(v, types[k] || 'text');
+            if (converted !== null) row[k] = converted;
+        });
+        return row;
+    });
+
+    const btn = document.getElementById('btn-confirm-import');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Import…';
+    showImportFeedback('loading', `Import de ${payload.length} ligne(s) en cours…`);
+
+    try {
+        const res  = await fetch(API_URL + "/clients/import", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
+        const json = await res.json();
+        if (!res.ok) {
+            showImportFeedback('error', `❌ ${json.detail || 'Erreur serveur'}`);
+        } else {
+            let msg = `✅ ${json.upserted} ligne(s) importée(s).`;
+            if (json.errors?.length)
+                msg += `  ⚠️ ${json.errors.length} erreur(s) : ${json.errors.slice(0, 3).join(' | ')}`;
+            showImportFeedback('success', msg);
+            allClients = [];
+            setTimeout(() => { closeImportModal(); loadBaseTab(); }, 2800);
+        }
+    } catch(e) {
+        showImportFeedback('error', `❌ Erreur réseau : ${e.message}`);
+        btn.disabled = false;
+        btn.textContent = '⬆ Confirmer l\'import';
+    }
+}
+
+function showImportFeedback(type, msg) {
+    const el = document.getElementById('import-feedback');
+    el.className = `feedback show ${type}`;
+    el.textContent = msg;
+}
+
+// Ferme la modal au clic sur le fond
+document.getElementById('import-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeImportModal();
+});
+</script>
+
+<!-- ── Modal Import CSV ── -->
+<div class="modal-overlay" id="import-modal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>⬆ Import CSV</h3>
+            <button class="modal-close" onclick="closeImportModal()">✕</button>
+        </div>
+        <div id="import-modal-info" class="modal-info"></div>
+        <div class="modal-preview-wrap">
+            <table class="modal-preview-table">
+                <thead id="import-preview-head"></thead>
+                <tbody id="import-preview-body"></tbody>
+            </table>
+        </div>
+        <p class="modal-more" id="import-more"></p>
+        <div id="import-feedback" class="feedback"></div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeImportModal()">Annuler</button>
+            <button class="btn btn-primary" id="btn-confirm-import" onclick="confirmImport()">
+                ⬆ Confirmer l'import
+            </button>
+        </div>
+    </div>
+</div>
+<input type="file" id="csv-file-input" accept=".csv" style="display:none" onchange="handleCSVFile(event)">
+
+<datalist id="list-collaborateur"></datalist>
+<datalist id="list-assistant"></datalist>
+
+</body>
+</html>
