@@ -56,7 +56,7 @@ function display(data) {
                 const cb = document.createElement('input');
                 cb.type = 'checkbox';
                 cb.checked = !!c[col.field];
-                cb.onchange = function () { updateCheckbox(c.id, col.field, this.checked, this); };
+                cb.onchange = function () { updateCheckbox(c["siret"], col.field, this.checked, this); };
                 td.appendChild(cb);
 
             } else if (col.type === 'select') {
@@ -65,14 +65,14 @@ function display(data) {
                     col.options.map(o =>
                         `<option value="${o.value}" ${c[col.field] === o.value ? 'selected' : ''}>${o.label}</option>`
                     ).join('');
-                sel.onchange = function () { updateSelect(c.id, col.field, this.value, this); };
+                sel.onchange = function () { updateSelect(c["siret"], col.field, this.value, this); };
                 td.appendChild(sel);
 
             } else if (col.type === 'date') {
                 const inp = document.createElement('input');
                 inp.type = 'date';
                 inp.value = formatDate(c[col.field]);
-                inp.onchange = function () { updateField(c.id, col.field, this.value, this); };
+                inp.onchange = function () { updateField(c["siret"], col.field, this.value, this); };
                 td.appendChild(inp);
 
             } else {
@@ -80,7 +80,7 @@ function display(data) {
                 const inp = document.createElement('input');
                 inp.type = 'text';
                 inp.value = c[col.field] || '';
-                inp.onchange = function () { updateField(c.id, col.field, this.value, this); };
+                inp.onchange = function () { updateField(c["siret"], col.field, this.value, this); };
                 td.appendChild(inp);
             }
 

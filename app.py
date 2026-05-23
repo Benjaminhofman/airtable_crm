@@ -77,6 +77,7 @@ def update_client(record_id):
 def update_airtable():
 
     data = request.json
+    print("REQUEST JSON COMPLET :", data)
 
     siret = data.get("siret")
     field = data.get("field")
