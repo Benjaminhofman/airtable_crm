@@ -78,14 +78,20 @@ def update_airtable():
 
     data = request.json
 
-    record_id = data.get("id")
+    siret = data.get("siret")
     field = data.get("field")
     value = data.get("value")
 
     print("\n===== UPDATE DEMANDÉ =====")
-    print("ID :", record_id)
+    print("SIRET :", siret)
     print("FIELD :", field)
     print("VALUE BRUT :", value)
+
+    records = get_records(formula=f"{{siret}}='{siret}'")
+    if not records or isinstance(records, dict):
+        return jsonify({"status": "error", "message": f"Aucun enregistrement trouvé pour siret={siret}"}), 404
+    record_id = records[0]["id"]
+    print("RECORD_ID RÉSOLU :", record_id)
 
     # 🔥 conversion automatique intelligente
 # 🔥 gestion intelligente des types
