@@ -1,4 +1,4 @@
-const API_URL = "https://projet-crm-m0o3.onrender.com";
+const API_URL = "";
 
 // Variable globale partagée entre toutes les pages déclaratives
 let dataGlobal = [];
