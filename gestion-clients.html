@@ -778,6 +778,32 @@ input:focus, select:focus {
     </div>
 
     <div class="card">
+        <div class="card-title">Données FEC</div>
+        <div class="field-grid">
+            <div class="field-group">
+                <label>CA (€)</label>
+                <input type="number" id="c-ca_r" step="0.01">
+            </div>
+            <div class="field-group">
+                <label>Résultat (€)</label>
+                <input type="number" id="c-resultat_r" step="0.01">
+            </div>
+            <div class="field-group">
+                <label>Trésorerie (€)</label>
+                <input type="number" id="c-tresorerie_r" step="0.01">
+            </div>
+            <div class="field-group">
+                <label>Code NAF</label>
+                <input type="text" id="c-code_naf_r">
+            </div>
+            <div class="field-group">
+                <label>Activité</label>
+                <input type="text" id="c-activite_r">
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
         <div class="card-title">Missions &amp; Déclarations</div>
         <div class="toggles-grid" id="toggles-creer"></div>
     </div>
@@ -921,6 +947,32 @@ input:focus, select:focus {
                 <div class="field-group">
                     <label>Code URSSAF</label>
                     <input type="text" id="m-code_urssaf">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Données FEC</div>
+            <div class="field-grid">
+                <div class="field-group">
+                    <label>CA (€)</label>
+                    <input type="number" id="m-ca_r" step="0.01">
+                </div>
+                <div class="field-group">
+                    <label>Résultat (€)</label>
+                    <input type="number" id="m-resultat_r" step="0.01">
+                </div>
+                <div class="field-group">
+                    <label>Trésorerie (€)</label>
+                    <input type="number" id="m-tresorerie_r" step="0.01">
+                </div>
+                <div class="field-group">
+                    <label>Code NAF</label>
+                    <input type="text" id="m-code_naf_r">
+                </div>
+                <div class="field-group">
+                    <label>Activité</label>
+                    <input type="text" id="m-activite_r">
                 </div>
             </div>
         </div>
@@ -1103,6 +1155,11 @@ const TEXT_FIELDS = [
     { id: "temps_passe",     field: "temps passé",    numeric: true },
     { id: "code_impot_gouv", field: "code impot gouv" },
     { id: "code_urssaf",     field: "code URSSAF" },
+    { id: "ca_r",            field: "CA R",         numeric: true },
+    { id: "resultat_r",      field: "resultat R",   numeric: true },
+    { id: "tresorerie_r",    field: "tresorerie R", numeric: true },
+    { id: "code_naf_r",      field: "code naf R" },
+    { id: "activite_r",      field: "activite R" },
 ];
 
 // ── Initialisation des toggles ────────────────────────────────────────────────
