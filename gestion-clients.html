@@ -1189,7 +1189,12 @@ function collectForm(prefix) {
     });
     TOGGLE_FIELDS.forEach(f => {
         const el = document.getElementById(`${prefix}-${f.id}`);
-        if (el) data[f.field] = el.checked;
+        if (!el) return;
+        // Lit l'état réel (checkbox) ou la valeur, puis force un vrai booléen JS
+        let v = el.type === 'checkbox' ? el.checked : el.value;
+        if (v === true || v === 'true') v = true;
+        else if (v === false || v === 'false') v = false;
+        data[f.field] = v;
     });
     return data;
 }
