@@ -216,17 +216,11 @@ async function loadClient() {
     const res = await fetch(API_URL + "/client/" + siret);
     const data = await res.json();
 
-    const createLink = data["creer client"];
-    const editLink = data["lien modification"];
-
     const createBtn = document.getElementById("create-link");
     const editBtn = document.getElementById("edit-link");
 
-    if (createLink) createBtn.href = createLink;
-    else createBtn.classList.add("disabled");
-
-    if (editLink) editBtn.href = editLink;
-    else editBtn.classList.add("disabled");
+    createBtn.href = "gestion-clients.html?mode=create";
+    editBtn.href = "gestion-clients.html?siret=" + encodeURIComponent(siret) + "&mode=edit";
 
     // 🔥 CALCULS
     const tempsPasse = parseFloat(data["temps passé"]) || 0;
